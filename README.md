@@ -275,35 +275,24 @@ Send customer feedback through the workflow and verify:
 
 ### n8n Workflow
 
-```markdown
-![n8n_workflow](screenshots/workflow.png)
-```
+<img src="./screenshots/workflow.png" alt="n8n Workflow">
+
 
 ### create table
 
-```
-![create table](screenshots/create_table.png)
-```
+<img src="./screenshots/create_table.png" alt="Create Table">
 
 ### Supabase Database
 
-```
-![Supabase Database](screenshots/supabase_results1.png)
-```
+<img src="./screenshots/supabase_results1.png" alt="Supabase Database">
 
-```
-![Supabase Database](screenshots/supabase_results2.png)
-```
+<img src="./screenshots/supabase_results2.png" alt="Supabase Database">
 
-```
-![Supabase Database](screenshots/supabase_results3.png)
-```
+<img src="./screenshots/supabase_results3.png" alt="Supabase Database">
 
 ### High-Risk Email Alert
 
-```
-![Email Alert](screenshots/gmail1.png)
-```
+<img src="./screenshots/gmail1.png" alt="High-Risk Email Alert">
 
 ---
 

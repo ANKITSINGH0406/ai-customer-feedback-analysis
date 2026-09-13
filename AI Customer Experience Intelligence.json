@@ -1,0 +1,753 @@
+{
+  "name": "AI Customer Experience Intelligence",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "id": "ffc2f218-c3ef-42d5-8e42-3cf23a5e5ae0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6160762f-b2d6-45c5-a498-07428b0c3296",
+              "leftValue": "={{ $json.Feedback }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        0
+      ],
+      "id": "a3e4d915-f9f2-4408-a46a-ec35029bb422",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Rd5xz3woJj7q6Wx-Cs59DljvR8otJEq_fjJU53wmCI8",
+          "mode": "list",
+          "cachedResultName": "AI Customer Experience Intelligence",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Rd5xz3woJj7q6Wx-Cs59DljvR8otJEq_fjJU53wmCI8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Rd5xz3woJj7q6Wx-Cs59DljvR8otJEq_fjJU53wmCI8/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": []
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "6377c932-1d8d-4019-9e60-b5c59dd140c4",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vnGaPZ2C8QsbZLop",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a8e76d7-9174-455a-ab7c-4e5336a208e7",
+              "name": "feedback_clean",
+              "value": "={{ $json.Feedback.trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "include": "except",
+        "excludeFields": "row_number",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1056,
+        -16
+      ],
+      "id": "088407aa-b24b-4b40-9f2b-166905cb004e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this customer feedback:\n\n{{ $json.feedback_clean }}\n\nReturn ONLY valid JSON.\n\n{\n  \"sentiment\": \"\",\n  \"sentiment_score\": 0,\n  \"category\": \"\",\n  \"subcategory\": \"\",\n  \"emotion\": \"\",\n  \"root_cause\": \"\",\n  \"priority\": \"\",\n  \"churn_risk\": \"\",\n  \"customer_intent\": \"\",\n  \"summary\": \"\",\n  \"recommendation\": \"\"\n}\n\nRules:\n\nsentiment = Positive, Neutral, or Negative.\n\nsentiment_score = number from 0 to 100.\n\ncategory = Product, Delivery, Customer Support, Pricing, Payment, Website/App, or Other.\n\npriority = Low, Medium, High, or Critical.\n\nchurn_risk = Low, Medium, or High.\n\ncustomer_intent = Complaint, Question, Suggestion, Praise, Request, or Other.\n\nKeep summary and recommendation short.\n\nReturn JSON only.",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert Customer Experience Data Analyst.  \n\nAnalyze the customer feedback below.  \n\nCUSTOMER FEEDBACK: \n{{ $json.feedback_clean }}  \n\nYour job is to identify:  \n\n1. Sentiment \n2. Sentiment score \n3. Category \n4. Subcategory \n5. Emotion \n6. Root cause \n7. Priority \n8. Churn risk \n9. Customer intent \n10. Short summary \n11. Business recommendation  \n\nUse these rules.  \n\nSENTIMENT: \n\nPositive \nNeutral \nNegative \n\nSENTIMENT SCORE: \n\n0 = extremely negative \n100 = extremely positive  \n\nCATEGORY: \n\nProduct \nDelivery \nCustomer Support \nPricing \nPayment \nWebsite/App \nOther  \n\nPRIORITY: \n\nLow \nMedium \nHigh \nCritical  \n\nCHURN RISK: \n\nLow \nMedium \nHigh  \n\nCUSTOMER INTENT: \n\nComplaint \nQuestion \nSuggestion \nPraise \nRequest \nOther  \n\nReturn ONLY valid JSON.  Use exactly this structure:  \n\n{   \n  \"sentiment\": \"\",   \n  \"sentiment_score\": 0,   \n  \"category\": \"\",   \n  \"subcategory\": \"\",   \n  \"emotion\": \"\",   \n  \"root_cause\": \"\",   \n  \"priority\": \"\",   \n  \"churn_risk\": \"\",   \n  \"customer_intent\": \"\",   \n  \"summary\": \"\",   \n  \"recommendation\": \"\" \n}  \n\nDo not add explanations outside the JSON."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1360,
+        -16
+      ],
+      "id": "f923312f-f8e3-4864-afc5-b9ffa91e2845",
+      "name": "Basic LLM Chain",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1200,
+        192
+      ],
+      "id": "7e6ad73e-e17a-4983-ae1d-9ab54594accb",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vpWIWClx0JDmI936",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e0a9e6f5-26d0-4c72-85a5-3021216a7f17",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"sentiment\": {\n      \"type\": \"string\"\n    },\n    \"sentiment_score\": {\n      \"type\": \"number\"\n    },\n    \"category\": {\n      \"type\": \"string\"\n    },\n    \"subcategory\": {\n      \"type\": \"string\"\n    },\n    \"emotion\": {\n      \"type\": \"string\"\n    },\n    \"root_cause\": {\n      \"type\": \"string\"\n    },\n    \"priority\": {\n      \"type\": \"string\"\n    },\n    \"churn_risk\": {\n      \"type\": \"string\"\n    },\n    \"customer_intent\": {\n      \"type\": \"string\"\n    },\n    \"summary\": {\n      \"type\": \"string\"\n    },\n    \"recommendation\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"sentiment\",\n    \"sentiment_score\",\n    \"category\",\n    \"subcategory\",\n    \"emotion\",\n    \"root_cause\",\n    \"priority\",\n    \"churn_risk\",\n    \"customer_intent\",\n    \"summary\",\n    \"recommendation\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        192
+      ],
+      "id": "2c569159-f91f-4e9e-944e-998ccfdf90fa",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const ai = $input.item.json.output;\nconst original = $('Edit Fields').item.json;\n\nlet riskScore = 0;\n\n// Sentiment\nif (ai.sentiment === \"Negative\") {\n  riskScore += 25;\n} else if (ai.sentiment === \"Neutral\") {\n  riskScore += 10;\n}\n\n// Priority\nif (ai.priority === \"Critical\") {\n  riskScore += 30;\n} else if (ai.priority === \"High\") {\n  riskScore += 20;\n} else if (ai.priority === \"Medium\") {\n  riskScore += 10;\n}\n\n// Churn Risk\nif (ai.churn_risk === \"High\") {\n  riskScore += 25;\n} else if (ai.churn_risk === \"Medium\") {\n  riskScore += 15;\n}\n\nriskScore = Math.min(riskScore, 100);\n\nlet riskLevel;\n\nif (riskScore >= 70) {\n  riskLevel = \"Critical\";\n} else if (riskScore >= 40) {\n  riskLevel = \"High\";\n} else if (riskScore >= 20) {\n  riskLevel = \"Medium\";\n} else {\n  riskLevel = \"Low\";\n}\n\nreturn {\n  json: {\n    Feedback_ID: original.Feedback_ID,\n    Customer_ID: original.Customer_ID,\n    Customer_Name: original.Customer_Name,\n    Date_Time: original.Date_Time,\n    Product: original.Product,\n    Region: original.Region,\n    Source: original.Source,\n    Customer_Value: original.Customer_Value,\n    Feedback: original.Feedback,\n\n    AI_Sentiment: ai.sentiment,\n    AI_Sentiment_Score: ai.sentiment_score,\n    Category: ai.category,\n    Subcategory: ai.subcategory,\n    Emotion: ai.emotion,\n    Root_Cause: ai.root_cause,\n    Priority: ai.priority,\n    Churn_Risk: ai.churn_risk,\n    Customer_Intent: ai.customer_intent,\n    AI_Summary: ai.summary,\n    Recommendation: ai.recommendation,\n\n    Risk_Score: riskScore,\n    Risk_Level: riskLevel,\n    Processed_Date: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        -16
+      ],
+      "id": "b17d9223-a8ef-4a4c-a3cd-cd836a06f92d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a342a21f-00fe-4866-bd19-1362bb3d4b70",
+              "leftValue": "={{ $json.risk_score }}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2368,
+        -16
+      ],
+      "id": "980c5ef8-009a-4390-b6b9-f95b9059edf1",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "sendTo": "mahardeepak876@gmail.com",
+        "subject": "=🚨 High-Risk Customer Alert — {{ $json.customer_name }}",
+        "emailType": "text",
+        "message": "=Hello Team,  \n\nA high-risk customer has been detected by the Customer Experience Intelligence system.  \n\nCUSTOMER DETAILS \n---------------- \nCustomer ID: {{ $json.customer_id }} \nCustomer Name: {{ $json.customer_name }} \nProduct: {{ $json.product }} \nRegion: {{ $json.region }}  \n\nCUSTOMER FEEDBACK \n-----------------\n{{ $json.feedback }}  \n\nAI ANALYSIS \n----------- \nSentiment: {{ $json.ai_sentiment }} \nCategory: {{ $json.category }} \nEmotion: {{ $json.emotion }} \nRoot Cause: {{ $json.root_cause }} \nPriority: {{ $json.priority }} \nChurn Risk: {{ $json.churn_risk }}  \n\nBUSINESS RISK \n------------- \nRisk Score: {{ $json.risk_score }}/100 \nRisk Level: {{ $json.risk_level }}  \n\nAI RECOMMENDATION \n----------------- \n{{ $json.recommendation }}  \n\nPlease review this customer case and take appropriate action.  \n\nRegards, \nAI Customer Experience Intelligence System",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2592,
+        -192
+      ],
+      "id": "27684d50-5ecc-4799-9cc2-919c28ffcee4",
+      "name": "Send a message",
+      "webhookId": "70d0ff5b-e12e-4fba-beea-7ae07b776da9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pMS8XyHLM5d7J62X",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09612256-9295-4486-b0d8-ba5a45a43feb",
+              "name": "Feedback_ID",
+              "value": "={{ $json.Feedback_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "aa0384e9-438b-4ab2-890a-09075b7e28bc",
+              "name": "Customer_ID",
+              "value": "={{ $json.Customer_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "e72b8d07-99b7-42b8-8cd6-c6426150ea74",
+              "name": "Customer_Name",
+              "value": "={{ $json.Customer_Name }}",
+              "type": "string"
+            },
+            {
+              "id": "50b71be0-bb66-4f4e-b1e0-f448a1314f8d",
+              "name": "Feedback",
+              "value": "={{ $json.Feedback }}",
+              "type": "string"
+            },
+            {
+              "id": "1d17ee8d-c468-412e-95f8-37a781624cc7",
+              "name": "Validation_Status",
+              "value": "Rejected",
+              "type": "string"
+            },
+            {
+              "id": "596c8a23-afdf-44d6-a698-564b985fd019",
+              "name": "Validation_Reason",
+              "value": "Feedback is empty",
+              "type": "string"
+            },
+            {
+              "id": "f27817a9-2e6a-42a8-8391-9ef86219e347",
+              "name": "Processed_Date",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        880,
+        304
+      ],
+      "id": "725a4ef3-e29d-44b7-912c-1f492aeed9a7",
+      "name": "Invalid Feedback Log"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "customer_feedback",
+          "mode": "list",
+          "cachedResultName": "customer_feedback"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "feedback_id": "={{ $json.Feedback_ID }}",
+            "customer_id": "={{ $json.Customer_ID }}",
+            "customer_name": "={{ $json.Customer_Name }}",
+            "date_time": "={{ DateTime.fromFormat($json.Date_Time, 'dd-MM-yyyy HH:mm').toISO() }}",
+            "product": "={{ $json.Product }}",
+            "region": "={{ $json.Region }}",
+            "source": "={{ $json.Source }}",
+            "customer_value": "={{ $json.Customer_Value }}",
+            "feedback": "={{ $json.Feedback }}",
+            "ai_sentiment": "={{ $json.AI_Sentiment }}",
+            "ai_sentiment_score": "={{ $json.AI_Sentiment_Score }}",
+            "category": "={{ $json.Category }}",
+            "subcategory": "={{ $json.Subcategory }}",
+            "emotion": "={{ $json.Emotion }}",
+            "root_cause": "={{ $json.Root_Cause }}",
+            "priority": "={{ $json.Priority }}",
+            "churn_risk": "={{ $json.Churn_Risk }}",
+            "customer_intent": "={{ $json.Customer_Intent }}",
+            "ai_summary": "={{ $json.AI_Summary }}",
+            "recommendation": "={{ $json.Recommendation }}",
+            "risk_score": "={{ $json.Risk_Score }}",
+            "risk_level": "={{ $json.Risk_Level }}",
+            "processed_date": "={{ $json.Processed_Date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "feedback_id",
+              "displayName": "feedback_id",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_id",
+              "displayName": "customer_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_time",
+              "displayName": "date_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product",
+              "displayName": "product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "region",
+              "displayName": "region",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_value",
+              "displayName": "customer_value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "feedback",
+              "displayName": "feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "original_sentiment",
+              "displayName": "original_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "original_confidence",
+              "displayName": "original_confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ai_sentiment",
+              "displayName": "ai_sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_sentiment_score",
+              "displayName": "ai_sentiment_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subcategory",
+              "displayName": "subcategory",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "emotion",
+              "displayName": "emotion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "root_cause",
+              "displayName": "root_cause",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "churn_risk",
+              "displayName": "churn_risk",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_intent",
+              "displayName": "customer_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_summary",
+              "displayName": "ai_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommendation",
+              "displayName": "recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risk_score",
+              "displayName": "risk_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risk_level",
+              "displayName": "risk_level",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "processed_date",
+              "displayName": "processed_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        2064,
+        -16
+      ],
+      "id": "5b78d543-29a3-4ef2-98b7-fc63e353b781",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "B4kH7WGnJcHppbxl",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Feedback Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "06342c03-4686-475b-b034-e8a974a469bd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a4ada13159099ef7dfe05171e2e67089bbef08ac1900049f2498eb0223fe759c"
+  },
+  "nodeGroups": [],
+  "id": "2GhGRtDma7Dw0HIO",
+  "tags": []
+}

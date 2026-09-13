@@ -278,7 +278,7 @@ Send customer feedback through the workflow and verify:
 Add your workflow screenshot here:
 
 ```markdown
-![n8n Workflow](screenshots/n8n_workflow.png)
+![n8n_workflow](screenshots/n8n_workflow.png)
 ```
 
 ### create table

@@ -281,27 +281,27 @@ Send customer feedback through the workflow and verify:
 
 ### create table
 
-```markdown
+```
 ![create table](screenshots/create_table.png)
 ```
 
 ### Supabase Database
 
-```markdown
+```
 ![Supabase Database](screenshots/supabase_results1.png)
 ```
 
-```markdown
+```
 ![Supabase Database](screenshots/supabase_results2.png)
 ```
 
-```markdown
+```
 ![Supabase Database](screenshots/supabase_results3.png)
 ```
 
 ### High-Risk Email Alert
 
-```markdown
+```
 ![Email Alert](screenshots/gmail1.png)
 ```
 
